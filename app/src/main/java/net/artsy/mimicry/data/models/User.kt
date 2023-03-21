@@ -1,6 +1,6 @@
 package net.artsy.mimicry.data.models
 
-class User {
-    lateinit var name: String
-    lateinit var email: String
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class User(var name: String, var email: String)
