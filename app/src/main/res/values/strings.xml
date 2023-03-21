@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">mimicry</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="button_text_fetch">fetch</string>
+    <string name="input_text_access_token">access token</string>
+    <string name="checkbox_text_persist_token">persist token</string>
+    <string name="button_text_clear">clear</string>
+    <string-array name="environments">
+        <item>local</item>
+        <item>staging</item>
+        <item>production</item>
+    </string-array>
 </resources>
