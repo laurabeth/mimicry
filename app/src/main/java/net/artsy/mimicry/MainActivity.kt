@@ -1,6 +1,7 @@
 package net.artsy.mimicry
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
@@ -8,20 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import net.artsy.mimicry.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
-	private lateinit var binding: ActivityMainBinding
-	private lateinit var fetchButton: Button
 	private lateinit var accessTokenInput: EditText
+	private lateinit var binding: ActivityMainBinding
 	private lateinit var envSpinner: Spinner
+	private lateinit var fetchButton: Button
+	private lateinit var persistCheckbox: CheckBox
 
-	override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-		if (parent != null) {
-			println(parent.getItemAtPosition(position))
-		}
-	}
-
-	override fun onNothingSelected(parent: AdapterView<*>?) {
-		TODO("Not yet implemented")
-	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -29,9 +22,22 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 		binding = ActivityMainBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 
+		assignHandlers()
+		restoreData()
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+
+		val vm = useMainActivityViewModel()
+		vm.value.handleDestroy()
+	}
+
+	private fun assignHandlers() {
 		accessTokenInput = findViewById(R.id.access_token_input)
 		fetchButton = findViewById(R.id.fetch_button)
 		envSpinner = findViewById(R.id.environment_spinner)
+		persistCheckbox = findViewById(R.id.persist_token_checkbox)
 
 		ArrayAdapter.createFromResource(
 			this,
@@ -43,18 +49,42 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 		}
 		envSpinner.onItemSelectedListener = this
 
-		val vm = viewModels<MainActivityViewModel>()
+		persistCheckbox.setOnCheckedChangeListener { _, isChecked ->
+			useMainActivityViewModel().value.handlePersist(
+				this,
+				isChecked,
+				accessTokenInput.text.toString()
+			)
+		}
 
 		fetchButton.setOnClickListener {
-			vm.value.handleClick(accessTokenInput.text.toString())
+			useMainActivityViewModel().value.handleFetch(
+				this
+			)
 		}
 	}
 
-	override fun onDestroy() {
-		super.onDestroy()
+	private fun restoreData() {
+		val prefs = useMainActivityViewModel().value.handleRestore(this)
+		Log.d("MainActivity/AccessToken", "${prefs.accessToken}")
+		persistCheckbox.isChecked = prefs.persist
+		envSpinner.setSelection(prefs.environmentIndex)
+		accessTokenInput.setText(prefs.accessToken)
+	}
 
-		val vm = viewModels<MainActivityViewModel>()
-		vm.value.handleDestroy()
+	private fun useMainActivityViewModel(): Lazy<MainActivityViewModel> {
+		return viewModels()
+	}
+
+	override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+		if (parent != null) {
+			useMainActivityViewModel().value.handleEnvironmentSelect(this, position)
+			restoreData()
+		}
+	}
+
+	override fun onNothingSelected(parent: AdapterView<*>?) {
+		TODO("Not yet implemented")
 	}
 }
 

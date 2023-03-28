@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="environments">
+        <item>local</item>
+        <item>staging</item>
+        <item>production</item>
+    </string-array>
+    <string-array name="metaphysics_endpoints">
+        <item>https://c24d-24-88-45-60.ngrok.io/v2</item>
+        <item>https://metaphysics-staging.artsy.net/v2</item>
+        <item>https://metaphysics-production.artsy.net/v2</item>
+    </string-array>
+</resources>

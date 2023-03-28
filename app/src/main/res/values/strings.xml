@@ -4,9 +4,6 @@
     <string name="input_text_access_token">access token</string>
     <string name="checkbox_text_persist_token">persist token</string>
     <string name="button_text_clear">clear</string>
-    <string-array name="environments">
-        <item>local</item>
-        <item>staging</item>
-        <item>production</item>
-    </string-array>
+    <string name="key_environment_index">environment</string>
+    <string name="key_persist_token">persist_token</string>
 </resources>
