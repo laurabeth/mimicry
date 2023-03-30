@@ -6,4 +6,4 @@ import kotlinx.serialization.Serializable
 data class MetaphysicsResponse(val data: MetaphysicsData)
 
 @Serializable
-data class MetaphysicsData(val me: User)
+data class MetaphysicsData(val me: User, val artworksForUser: ArtworksForUser)

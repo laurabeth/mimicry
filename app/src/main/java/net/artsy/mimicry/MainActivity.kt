@@ -5,23 +5,21 @@ import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import net.artsy.mimicry.data.models.MetaphysicsData
 import net.artsy.mimicry.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
-	private lateinit var binding: ActivityMainBinding
-	private lateinit var fetchButton: Button
+	private val vm: MainActivityViewModel by viewModels()
+
 	private lateinit var accessTokenInput: EditText
+	private lateinit var binding: ActivityMainBinding
 	private lateinit var envSpinner: Spinner
+	private lateinit var fetchButton: Button
+	private lateinit var persistCheckbox: CheckBox
+	private lateinit var urlTextView: TextView
+	private lateinit var dataTextView: TextView
 
-	override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-		if (parent != null) {
-			println(parent.getItemAtPosition(position))
-		}
-	}
-
-	override fun onNothingSelected(parent: AdapterView<*>?) {
-		TODO("Not yet implemented")
-	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -29,10 +27,29 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 		binding = ActivityMainBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 
-		accessTokenInput = findViewById(R.id.access_token_input)
-		fetchButton = findViewById(R.id.fetch_button)
-		envSpinner = findViewById(R.id.environment_spinner)
+		assignUiElements()
+		createObservers()
+		restoreData()
+		assignHandlers()
+	}
 
+	override fun onDestroy() {
+		super.onDestroy()
+
+		vm.handleDestroy()
+	}
+
+	private fun createObservers() {
+		val dataObserver = Observer<MetaphysicsData?> { newData ->
+			dataTextView.setText(newData.toString())
+		}
+
+		vm.data.observe(this, dataObserver)
+	}
+
+	private fun assignUiElements() {
+		dataTextView = findViewById(R.id.data_display_text)
+		envSpinner = findViewById(R.id.environment_spinner)
 		ArrayAdapter.createFromResource(
 			this,
 			R.array.environments,
@@ -41,20 +58,46 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 			envSpinner.adapter = adapter
 		}
-		envSpinner.onItemSelectedListener = this
+		urlTextView = findViewById(R.id.url_display_text)
+		accessTokenInput = findViewById(R.id.access_token_input)
+		fetchButton = findViewById(R.id.fetch_button)
+		persistCheckbox = findViewById(R.id.persist_token_checkbox)
+	}
 
-		val vm = viewModels<MainActivityViewModel>()
+	private fun assignHandlers() {
+		persistCheckbox.setOnCheckedChangeListener { _, isChecked ->
+			vm.handlePersist(
+				this,
+				isChecked,
+				accessTokenInput.text.toString()
+			)
+		}
 
 		fetchButton.setOnClickListener {
-			vm.value.handleClick(accessTokenInput.text.toString())
+			vm.handleFetch()
+		}
+
+		envSpinner.onItemSelectedListener = this
+	}
+
+	private fun restoreData() {
+		val prefs = vm.handleRestore(this)
+
+		envSpinner.setSelection(prefs.environmentIndex)
+		urlTextView.setText(prefs.url)
+		persistCheckbox.isChecked = prefs.persist
+		accessTokenInput.setText(prefs.accessToken)
+	}
+
+	override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+		if (parent != null) {
+			vm.handleEnvironmentSelect(this, position)
+			restoreData()
 		}
 	}
 
-	override fun onDestroy() {
-		super.onDestroy()
-
-		val vm = viewModels<MainActivityViewModel>()
-		vm.value.handleDestroy()
+	override fun onNothingSelected(parent: AdapterView<*>?) {
+		TODO("Not yet implemented")
 	}
 }
 
