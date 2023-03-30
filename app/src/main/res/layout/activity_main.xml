@@ -9,8 +9,9 @@
     <EditText
         android:id="@+id/access_token_input"
         android:layout_width="278dp"
-        android:layout_height="192dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="241dp"
+        android:autofillHints="access token"
         android:ems="10"
         android:inputType="textMultiLine"
         android:maxLines="4"
@@ -19,8 +20,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        android:autofillHints="access token" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/fetch_button"
@@ -58,12 +58,34 @@
         android:id="@+id/environment_spinner"
         android:layout_width="278dp"
         android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/text_url_display"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/url_display_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/access_token_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.66" />
+        app:layout_constraintTop_toBottomOf="@+id/environment_spinner"
+        app:layout_constraintVertical_bias="0.05" />
+
+    <TextView
+        android:id="@+id/data_display_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/access_token_input"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/url_display_text"
+        app:layout_constraintVertical_bias="0.2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

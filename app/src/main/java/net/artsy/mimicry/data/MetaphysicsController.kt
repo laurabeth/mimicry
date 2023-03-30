@@ -1,6 +1,5 @@
 package net.artsy.mimicry.data
 
-import android.content.Context
 import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -9,12 +8,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import net.artsy.mimicry.R
 import net.artsy.mimicry.data.models.MetaphysicsData
 import net.artsy.mimicry.data.models.MetaphysicsResponse
 
-class MetaphysicsController(private val context: Context, private val client: HttpClient) {
-	suspend fun requestUserData(environmentIndex: Int, accessToken: String): MetaphysicsData? {
+class MetaphysicsController(private var url: String, private val client: HttpClient) {
+	suspend fun requestUserData(accessToken: String): MetaphysicsData? {
 		val query = """
       query {
         me {
@@ -34,7 +32,7 @@ class MetaphysicsController(private val context: Context, private val client: Ht
   """.trimIndent()
 
 		val response =
-			client.post(context.resources.getStringArray(R.array.metaphysics_endpoints)[environmentIndex]) {
+			client.post(url) {
 				headers {
 					append(
 						"X-Access-Token",
@@ -50,10 +48,12 @@ class MetaphysicsController(private val context: Context, private val client: Ht
 
 		if (response.status.value == 200) {
 			println("Success")
+			Log.d("MetaphysicsController/Success", response.bodyAsText())
 		} else {
 			Log.e("MetaphysicsController/Failure", response.bodyAsText())
 			return null
 		}
+
 		return response.body<MetaphysicsResponse>().data
 	}
 }
