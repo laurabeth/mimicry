@@ -6,7 +6,6 @@ import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import net.artsy.mimicry.data.models.MetaphysicsData
 import net.artsy.mimicry.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -40,11 +39,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 	}
 
 	private fun createObservers() {
-		val dataObserver = Observer<MetaphysicsData?> { newData ->
-			dataTextView.setText(newData.toString())
+//		val dataObserver = Observer<MetaphysicsData?> { newData ->
+//			dataTextView.setText(newData.toString())
+//		}
+		val artworksObserver = Observer<String> { newArtwork ->
+			dataTextView.setText(newArtwork.toString())
 		}
 
-		vm.data.observe(this, dataObserver)
+		vm.artworks.observe(this, artworksObserver)
 	}
 
 	private fun assignUiElements() {

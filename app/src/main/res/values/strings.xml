@@ -6,4 +6,5 @@
     <string name="button_text_clear">clear</string>
     <string name="key_environment_index">environment</string>
     <string name="key_persist_token">persist_token</string>
+    <string name="prefs_key">artsy_shared_prefs</string>
 </resources>

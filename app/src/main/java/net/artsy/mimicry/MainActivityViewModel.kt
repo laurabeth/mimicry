@@ -6,6 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.put
 import net.artsy.mimicry.data.MetaphysicsController
 import net.artsy.mimicry.data.MimicryClient
 import net.artsy.mimicry.data.MimicryPrefs
@@ -15,6 +18,9 @@ class MainActivityViewModel : ViewModel() {
 	private val mimicryClient = MimicryClient
 	val data: MutableLiveData<MetaphysicsData?> by lazy {
 		MutableLiveData<MetaphysicsData?>()
+	}
+	val artworks: MutableLiveData<String> by lazy {
+		MutableLiveData<String>()
 	}
 	private var environmentIndex: Int = 0
 	private var persist: Boolean = false
@@ -26,7 +32,23 @@ class MainActivityViewModel : ViewModel() {
 			viewModelScope.launch {
 				val mpController =
 					MetaphysicsController(url!!, mimicryClient.get())
-				data.setValue(mpController.requestUserData(token!!))
+				val response: MetaphysicsData? = mpController.requestUserData(token!!)
+
+				if (response == null) return@launch
+
+//				data.setValue(response)
+				val parsedWorks = response.artworksForUser.edges.map { edge ->
+					edge.node
+				}
+				val artworksJson = buildJsonArray {
+					parsedWorks.map { work ->
+						addJsonObject {
+							put("id", work.id)
+							put("title", work.title)
+						}
+					}
+				}
+				artworks.setValue(artworksJson.toString())
 			}
 		} else {
 			Log.e("Fetch Error", "Token cannot be left blank")

@@ -19,12 +19,18 @@ class MetaphysicsController(private var url: String, private val client: HttpCli
           name
           email
         }
-				
 				artworksForUser(first: 10, includeBackfill: true) {
           edges {
             node {
               title
               id
+							artist {
+								name
+							}
+							image {
+								aspectRatio
+								url(version: "medium")
+							}
             }
           }
         }
